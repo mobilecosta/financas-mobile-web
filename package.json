@@ -23,24 +23,26 @@
   },
   "homepage": "https://github.com/mobilecosta/financas-mobile-web#readme",
   "devDependencies": {
-    "@angular-devkit/build-angular": "^21.1.5",
-    "@angular/cli": "^21.1.5",
-    "@angular/compiler-cli": "^21.1.5",
+    "@angular-devkit/build-angular": "^21.1.4",
+    "@angular/cli": "^21.1.4",
+    "@angular/compiler-cli": "^21.1.4",
     "@types/node": "^20.8.9",
-    "typescript": "^5.2.2"
+    "typescript": "~5.9.0"
   },
   "dependencies": {
-    "@angular/animations": "^21.1.5",
-    "@angular/common": "^21.1.5",
-    "@angular/core": "^21.1.5",
-    "@angular/forms": "^21.1.5",
-    "@angular/platform-browser": "^21.1.5",
-    "@angular/platform-browser-dynamic": "^21.1.5",
-    "@angular/router": "^21.1.5",
-    "@po-ui/ng-components": "^18.0.0",
-    "@po-ui/ng-templates": "^18.0.0",
+    "@angular/animations": "^21.1.4",
+    "@angular/common": "^21.1.4",
+    "@angular/compiler": "^21.1.4",
+    "@angular/core": "^21.1.4",
+    "@angular/forms": "^21.1.4",
+    "@angular/platform-browser": "^21.1.4",
+    "@angular/platform-browser-dynamic": "^21.1.4",
+    "@angular/router": "^21.1.4",
+    "@po-ui/ng-components": "^21.2.0",
+    "@po-ui/ng-templates": "^21.2.0",
+    "@po-ui/style": "^21.2.0",
     "rxjs": "^7.8.2",
     "tslib": "^2.8.1",
-    "zone.js": "^0.14.2"
+    "zone.js": "~0.15.0"
   }
 }

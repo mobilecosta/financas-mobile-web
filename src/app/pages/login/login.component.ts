@@ -1,42 +1,33 @@
 import { Component } from '@angular/core';
 import { CommonModule } from '@angular/common';
-import { FormsModule, ReactiveFormsModule, FormBuilder, FormGroup, Validators } from '@angular/forms';
+import { FormsModule, ReactiveFormsModule } from '@angular/forms';
 import { Router } from '@angular/router';
 import { PoModule } from '@po-ui/ng-components';
+import { PoTemplatesModule } from '@po-ui/ng-templates';
 import { AuthService } from '../../services/auth.service';
 
 @Component({
   selector: 'app-login',
   standalone: true,
-  imports: [CommonModule, FormsModule, ReactiveFormsModule, PoModule],
+  imports: [CommonModule, FormsModule, ReactiveFormsModule, PoModule, PoTemplatesModule],
   template: `
-    <po-container>
-      <po-page-login
-        p-title="Financas Mobile"
-        p-subtitle="Sistema de Controle Financeiro"
-        [p-login]="loginForm"
-        (p-login-submit)="login($event)"
-      ></po-page-login>
-    </po-container>
+    <po-page-login
+      p-product-name="Financas Mobile"
+      (p-login-submit)="login($event)"
+    ></po-page-login>
   `,
   styles: [],
 })
 export class LoginComponent {
-  loginForm: any = {
-    login: '',
-    password: '',
-    tenant: '',
-  };
-
   constructor(
     private authService: AuthService,
     private router: Router,
   ) {}
 
   login(event: any): void {
-    const { login, password, tenant } = event;
+    const { login, password } = event;
 
-    this.authService.login(login, password, tenant).subscribe({
+    this.authService.login(login, password, '').subscribe({
       next: () => {
         this.router.navigate(['/dashboard']);
       },

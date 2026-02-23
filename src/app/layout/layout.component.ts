@@ -1,7 +1,7 @@
 import { Component, OnInit } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { RouterModule } from '@angular/router';
-import { PoModule } from '@po-ui/ng-components';
+import { PoModule, PoToolbarAction } from '@po-ui/ng-components';
 import { MenuService } from '../services/menu.service';
 import { AuthService } from '../services/auth.service';
 
@@ -10,31 +10,31 @@ import { AuthService } from '../services/auth.service';
   standalone: true,
   imports: [CommonModule, RouterModule, PoModule],
   template: `
-    <po-container>
-      <po-page-default>
-        <po-toolbar p-title="Financas Mobile">
-          <po-toolbar-action
-            p-icon="po-icon-exit"
-            p-label="Sair"
-            (p-action)="logout()"
-          ></po-toolbar-action>
-        </po-toolbar>
-
-        <div class="po-row">
-          <div class="po-md-3">
-            <po-menu [p-menus]="menuItems"></po-menu>
-          </div>
-          <div class="po-md-9">
-            <router-outlet></router-outlet>
-          </div>
-        </div>
-      </po-page-default>
-    </po-container>
+    <po-toolbar
+      p-title="Financas Mobile"
+      [p-actions]="toolbarActions"
+    ></po-toolbar>
+    <div class="po-row">
+      <div class="po-md-3">
+        <po-menu [p-menus]="menuItems"></po-menu>
+      </div>
+      <div class="po-md-9">
+        <router-outlet></router-outlet>
+      </div>
+    </div>
   `,
   styles: [],
 })
 export class LayoutComponent implements OnInit {
   menuItems: any[] = [];
+
+  toolbarActions: PoToolbarAction[] = [
+    {
+      icon: 'ICON_EXIT',
+      label: 'Sair',
+      action: () => this.logout(),
+    },
+  ];
 
   constructor(
     private menuService: MenuService,

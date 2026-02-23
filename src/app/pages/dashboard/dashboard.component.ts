@@ -14,35 +14,34 @@ import { ApiService } from '../../services/api.service';
           <div class="po-md-3">
             <po-info
               p-label="Saldo Total"
-              [p-value]="dashboard.indicadores.saldoTotal | currency"
+              [p-value]="formatCurrency(dashboard.indicadores.saldoTotal)"
             ></po-info>
           </div>
           <div class="po-md-3">
             <po-info
               p-label="Receitas"
-              [p-value]="dashboard.indicadores.receitas | currency"
+              [p-value]="formatCurrency(dashboard.indicadores.receitas)"
             ></po-info>
           </div>
           <div class="po-md-3">
             <po-info
               p-label="Despesas"
-              [p-value]="dashboard.indicadores.despesas | currency"
+              [p-value]="formatCurrency(dashboard.indicadores.despesas)"
             ></po-info>
           </div>
           <div class="po-md-3">
             <po-info
               p-label="Saldo do Mês"
-              [p-value]="dashboard.indicadores.saldo | currency"
+              [p-value]="formatCurrency(dashboard.indicadores.saldo)"
             ></po-info>
           </div>
         </div>
 
-        <po-page-content p-title="Transações Recentes">
-          <po-table
-            [p-items]="dashboard?.transacoes || []"
-            [p-columns]="columns"
-          ></po-table>
-        </po-page-content>
+        <po-divider p-label="Transações Recentes"></po-divider>
+        <po-table
+          [p-items]="dashboard?.transacoes || []"
+          [p-columns]="columns"
+        ></po-table>
       </po-page-default>
     </po-container>
   `,
@@ -61,6 +60,11 @@ export class DashboardComponent implements OnInit {
 
   ngOnInit(): void {
     this.loadDashboard();
+  }
+
+  formatCurrency(value: number): string {
+    if (value == null) return '';
+    return new Intl.NumberFormat('pt-BR', { style: 'currency', currency: 'BRL' }).format(value);
   }
 
   loadDashboard(): void {

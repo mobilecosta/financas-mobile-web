@@ -1,7 +1,7 @@
-import { Component, OnInit } from '@angular/core';
+import { Component, OnInit, ViewChild } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { FormsModule, ReactiveFormsModule } from '@angular/forms';
-import { PoModule } from '@po-ui/ng-components';
+import { PoModule, PoModalComponent } from '@po-ui/ng-components';
 import { ApiService } from '../../services/api.service';
 import { FormMetadataService } from '../../services/form-metadata.service';
 
@@ -12,24 +12,17 @@ import { FormMetadataService } from '../../services/form-metadata.service';
   template: `
     <po-container>
       <po-page-default p-title="Contas">
-        <po-page-content>
-          <po-button
-            p-label="Nova Conta"
-            p-icon="po-icon-plus"
-            (p-click)="openForm()"
-          ></po-button>
+        <po-button
+          p-label="Nova Conta"
+          p-icon="ICON_PLUS"
+          (p-click)="openForm()"
+        ></po-button>
 
-          <po-table
-            [p-items]="contas"
-            [p-columns]="columns"
-            [p-loading]="loading"
-            [p-page]="page"
-            [p-page-size]="pageSize"
-            [p-total]="total"
-            (p-page-change)="onPageChange($event)"
-            (p-row-action)="onRowAction($event)"
-          ></po-table>
-        </po-page-content>
+        <po-table
+          [p-items]="contas"
+          [p-columns]="columns"
+          [p-loading]="loading"
+        ></po-table>
 
         <po-modal
           #formModal
@@ -46,7 +39,8 @@ import { FormMetadataService } from '../../services/form-metadata.service';
             ></po-input>
 
             <po-select
-              [(ngModel)]="formData.tipo"
+              [ngModel]="formData.tipo"
+              (ngModelChange)="formData.tipo = $event"
               p-label="Tipo"
               p-name="tipo"
               [p-options]="tipoOptions"
@@ -72,6 +66,8 @@ import { FormMetadataService } from '../../services/form-metadata.service';
   styles: [],
 })
 export class ContasComponent implements OnInit {
+  @ViewChild('formModal') formModal!: PoModalComponent;
+
   contas: any[] = [];
   loading = false;
   page = 1;
@@ -98,6 +94,7 @@ export class ContasComponent implements OnInit {
 
   secondaryAction: any = {
     label: 'Cancelar',
+    action: () => this.formModal.close(),
   };
 
   constructor(
@@ -128,6 +125,7 @@ export class ContasComponent implements OnInit {
 
   openForm(): void {
     this.formData = {};
+    this.formModal.open();
   }
 
   saveAccount(): void {
@@ -135,19 +133,11 @@ export class ContasComponent implements OnInit {
       next: () => {
         this.loadContas();
         this.formData = {};
+        this.formModal.close();
       },
       error: (error) => {
         console.error('Erro ao salvar conta:', error);
       },
     });
-  }
-
-  onPageChange(event: any): void {
-    this.page = event.page;
-    this.loadContas();
-  }
-
-  onRowAction(event: any): void {
-    console.log('Row action:', event);
   }
 }
