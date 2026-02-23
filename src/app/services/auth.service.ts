@@ -14,6 +14,7 @@ export class AuthService {
 
   constructor(private http: HttpClient) {
     this.loadUserFromStorage();
+    this.startTokenRefresh();
   }
 
   login(email: string, senha: string, tenantId: string): Observable<any> {
@@ -71,5 +72,30 @@ export class AuthService {
     if (usuario) {
       this.currentUserSubject.next(JSON.parse(usuario));
     }
+  }
+
+  private startTokenRefresh(): void {
+    // Fazer refresh do token a cada 30 minutos
+    setInterval(() => {
+      if (this.isAuthenticated()) {
+        this.refresh().subscribe(
+          () => {
+            // Token renovado com sucesso
+          },
+          () => {
+            // Se falhar, faz logout
+            this.logout();
+          },
+        );
+      }
+    }, 30 * 60 * 1000);
+  }
+
+  private refresh(): Observable<any> {
+    return this.http.post(`${this.apiUrl}/refresh`, {}).pipe(
+      tap((response: any) => {
+        localStorage.setItem('access_token', response.access_token);
+      }),
+    );
   }
 }

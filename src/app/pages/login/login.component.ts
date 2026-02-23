@@ -5,6 +5,7 @@ import { Router } from '@angular/router';
 import { PoModule } from '@po-ui/ng-components';
 import { PoTemplatesModule } from '@po-ui/ng-templates';
 import { AuthService } from '../../services/auth.service';
+import { environment } from '@environments/environment';
 
 @Component({
   selector: 'app-login',
@@ -27,7 +28,7 @@ export class LoginComponent {
   login(event: any): void {
     const { login, password } = event;
 
-    this.authService.login(login, password, '').subscribe({
+    this.authService.login(login, password, environment.tenantId).subscribe({
       next: () => {
         this.router.navigate(['/dashboard']);
       },
