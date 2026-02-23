@@ -20,7 +20,7 @@ import { environment } from '@environments/environment';
             formControlName="nome"
             p-label="Nome Completo"
             p-help="Digite seu nome completo"
-            [p-required]="true"
+            p-required
             p-error-pattern="O nome é obrigatório e deve ter pelo menos 3 caracteres"
           ></po-input>
 
@@ -29,7 +29,7 @@ import { environment } from '@environments/environment';
             p-label="Email"
             p-type="email"
             p-help="Digite seu email"
-            [p-required]="true"
+            p-required
             p-error-pattern="Digite um email válido"
           ></po-input>
 
@@ -37,7 +37,7 @@ import { environment } from '@environments/environment';
             formControlName="senha"
             p-label="Senha"
             p-help="Mínimo 6 caracteres"
-            [p-required]="true"
+            p-required
             p-error-pattern="A senha é obrigatória e deve ter pelo menos 6 caracteres"
           ></po-password>
 
@@ -45,7 +45,7 @@ import { environment } from '@environments/environment';
             formControlName="confirmaSenha"
             p-label="Confirmar Senha"
             p-help="Confirme sua senha"
-            [p-required]="true"
+            p-required
             p-error-pattern="As senhas não coincidem"
           ></po-password>
 
