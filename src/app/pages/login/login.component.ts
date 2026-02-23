@@ -12,39 +12,44 @@ import { environment } from '@environments/environment';
   standalone: true,
   imports: [CommonModule, FormsModule, ReactiveFormsModule, RouterModule, PoModule, PoTemplatesModule],
   template: `
-    <div class="login-page">
+    <div class="login-container">
       <po-page-login
         p-product-name="Financas Mobile"
         (p-login-submit)="login($event)"
-      >
-        <div class="login-footer">
-          <p>
-            Não tem uma conta?
-            <a (click)="goToRegister()" class="register-link">Registre-se aqui</a>
-          </p>
-        </div>
-      </po-page-login>
+      ></po-page-login>
+      
+      <div class="login-footer">
+        <p>
+          Não tem uma conta?
+          <a (click)="goToRegister()" class="register-link">Clique aqui para se registrar</a>
+        </p>
+      </div>
     </div>
   `,
   styles: [`
-    .login-page {
-      height: 100vh;
+    .login-container {
       display: flex;
+      flex-direction: column;
       align-items: center;
       justify-content: center;
+      min-height: 100vh;
     }
 
     .login-footer {
       text-align: center;
-      margin-top: 20px;
-      padding-top: 20px;
-      border-top: 1px solid #ddd;
+      margin-top: 30px;
+      padding: 20px;
+      background: white;
+      border-radius: 8px;
+      box-shadow: 0 2px 8px rgba(0, 0, 0, 0.1);
+      width: 100%;
+      max-width: 400px;
     }
 
     .login-footer p {
       margin: 0;
-      color: #666;
-      font-size: 14px;
+      color: #333;
+      font-size: 15px;
     }
 
     .register-link {
@@ -53,10 +58,12 @@ import { environment } from '@environments/environment';
       font-weight: bold;
       cursor: pointer;
       margin-left: 5px;
+      border-bottom: 2px solid #0066cc;
     }
 
     .register-link:hover {
-      text-decoration: underline;
+      color: #0052a3;
+      border-bottom-color: #0052a3;
     }
   `],
 })
