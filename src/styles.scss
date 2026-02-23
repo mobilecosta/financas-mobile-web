@@ -1,0 +1,63 @@
+/* Estilos globais */
+* {
+  margin: 0;
+  padding: 0;
+  box-sizing: border-box;
+}
+
+html,
+body {
+  height: 100%;
+  font-family: 'Roboto', sans-serif;
+}
+
+body {
+  margin: 0;
+  font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', 'Roboto', 'Oxygen',
+    'Ubuntu', 'Cantarell', 'Fira Sans', 'Droid Sans', 'Helvetica Neue',
+    sans-serif;
+  -webkit-font-smoothing: antialiased;
+  -moz-osx-font-smoothing: grayscale;
+}
+
+app-root {
+  display: block;
+  height: 100%;
+}
+
+/* PO UI Customization */
+.po-container {
+  max-width: 1200px;
+  margin: 0 auto;
+}
+
+.po-page-default {
+  padding: 20px;
+}
+
+.po-row {
+  display: flex;
+  flex-wrap: wrap;
+  margin: -10px;
+}
+
+.po-md-3,
+.po-md-9 {
+  flex: 1;
+  padding: 10px;
+}
+
+.po-md-3 {
+  flex: 0 0 25%;
+}
+
+.po-md-9 {
+  flex: 0 0 75%;
+}
+
+@media (max-width: 768px) {
+  .po-md-3,
+  .po-md-9 {
+    flex: 0 0 100%;
+  }
+}
