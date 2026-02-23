@@ -2,7 +2,7 @@ import { Component } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { FormsModule, ReactiveFormsModule, FormBuilder, FormGroup, Validators } from '@angular/forms';
 import { RouterModule, Router } from '@angular/router';
-import { PoModule } from '@po-ui/ng-components';
+import { PoModule, PoNotificationService } from '@po-ui/ng-components';
 import { PoTemplatesModule } from '@po-ui/ng-templates';
 import { AuthService } from '../../services/auth.service';
 import { environment } from '@environments/environment';
@@ -152,6 +152,7 @@ export class RegisterComponent {
     private authService: AuthService,
     private router: Router,
     private fb: FormBuilder,
+    private poNotification: PoNotificationService,
   ) {
     this.registerForm = this.fb.group(
       {
@@ -168,11 +169,17 @@ export class RegisterComponent {
     const senha = group.get('senha');
     const confirmaSenha = group.get('confirmaSenha');
 
-    if (senha && confirmaSenha && senha.value !== confirmaSenha.value) {
-      confirmaSenha.setErrors({ 'passwordMismatch': true });
-      return { 'passwordMismatch': true };
+    if (senha && confirmaSenha) {
+      if (senha.value !== confirmaSenha.value) {
+        confirmaSenha.setErrors({ passwordMismatch: true });
+      } else {
+        const errors = confirmaSenha.errors;
+        if (errors) {
+          delete errors['passwordMismatch'];
+          confirmaSenha.setErrors(Object.keys(errors).length ? errors : null);
+        }
+      }
     }
-
     return null;
   }
 
@@ -191,6 +198,7 @@ export class RegisterComponent {
       error: (error) => {
         console.error('Erro ao registrar:', error);
         this.isLoading = false;
+        this.poNotification.error('Erro ao registrar. Verifique os dados e tente novamente.');
       },
     });
   }
