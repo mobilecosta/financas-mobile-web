@@ -7,7 +7,6 @@ import { ContasComponent } from './pages/contas/contas.component';
 import { AuthGuard } from './guards/auth.guard';
 
 export const routes: Routes = [
-  { path: '', redirectTo: '/dashboard', pathMatch: 'full' },
   { path: 'login', component: LoginComponent },
   { path: 'register', component: RegisterComponent },
   {
@@ -19,5 +18,6 @@ export const routes: Routes = [
       { path: 'contas', component: ContasComponent },
     ],
   },
+  { path: '', redirectTo: '/dashboard', pathMatch: 'full' },
   { path: '**', redirectTo: '/dashboard' },
 ];

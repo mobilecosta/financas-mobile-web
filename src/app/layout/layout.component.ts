@@ -1,8 +1,8 @@
 import { Component, OnInit } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { RouterModule } from '@angular/router';
-import { PoModule, PoToolbarAction } from '@po-ui/ng-components';
-import { MenuService } from '../services/menu.service';
+import { PoModule, PoToolbarAction, PoMenuItem } from '@po-ui/ng-components';
+import { MenuService, MenuItem } from '../services/menu.service';
 import { AuthService } from '../services/auth.service';
 
 @Component({
@@ -26,11 +26,11 @@ import { AuthService } from '../services/auth.service';
   styles: [],
 })
 export class LayoutComponent implements OnInit {
-  menuItems: any[] = [];
+  menuItems: Array<PoMenuItem> = [];
 
   toolbarActions: PoToolbarAction[] = [
     {
-      icon: 'ICON_EXIT',
+      icon: 'po-icon-exit',
       label: 'Sair',
       action: () => this.logout(),
     },
@@ -48,12 +48,48 @@ export class LayoutComponent implements OnInit {
   loadMenu(): void {
     this.menuService.loadMenu().subscribe({
       next: (menu) => {
-        this.menuItems = this.menuService.buildMenuTree(menu);
+        this.menuItems = this.convertToPoMenu(menu);
       },
       error: (error) => {
         console.error('Erro ao carregar menu:', error);
       },
     });
+  }
+
+  private convertToPoMenu(items: MenuItem[]): Array<PoMenuItem> {
+    const menuTree = this.menuService.buildMenuTree(items);
+    return this.mapToPoMenu(menuTree);
+  }
+
+  private mapToPoMenu(items: MenuItem[]): Array<PoMenuItem> {
+    return items.map(item => ({
+      label: item.label,
+      icon: this.convertIcon(item.icon),
+      link: item.rota || undefined,
+      subItems: item.children && item.children.length > 0 
+        ? this.mapToPoMenu(item.children) 
+        : undefined
+    }));
+  }
+
+  private convertIcon(icon: string | undefined): string {
+    if (!icon) return 'po-icon-folder';
+    
+    const iconMap: { [key: string]: string } = {
+      'po-icon-home': 'po-icon-home',
+      'po-icon-finance': 'po-icon-finance',
+      'po-icon-bank': 'po-icon-bank',
+      'po-icon-bank-account': 'po-icon-bank',
+      'po-icon-tags': 'po-icon-tags',
+      'po-icon-chart': 'po-icon-chart',
+      'po-icon-chart-bar': 'po-icon-chart',
+      'po-icon-settings': 'po-icon-settings',
+      'po-icon-user': 'po-icon-user',
+      'po-icon-lock': 'po-icon-lock',
+      'po-icon-document': 'po-icon-document',
+    };
+    
+    return iconMap[icon] || 'po-icon-folder';
   }
 
   logout(): void {
