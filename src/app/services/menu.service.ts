@@ -4,46 +4,55 @@ import { Observable, BehaviorSubject } from 'rxjs';
 import { tap } from 'rxjs/operators';
 import { environment } from '@environments/environment';
 
+export interface MenuItem {
+  id: string;
+  label: string;
+  icon: string;
+  rota?: string;
+  ordem: number;
+  ativo: boolean;
+  parent_id?: string;
+  children?: MenuItem[];
+}
+
 @Injectable({
   providedIn: 'root',
 })
 export class MenuService {
   private apiUrl = `${environment.apiUrl}/metadata`;
-  private menuSubject = new BehaviorSubject<any[]>([]);
+  private menuSubject = new BehaviorSubject<MenuItem[]>([]);
   public menu$ = this.menuSubject.asObservable();
 
   constructor(private http: HttpClient) {}
 
-  loadMenu(): Observable<any[]> {
-    return this.http.get<any[]>(`${this.apiUrl}/menu`).pipe(
+  loadMenu(): Observable<MenuItem[]> {
+    return this.http.get<MenuItem[]>(`${this.apiUrl}/menu`).pipe(
       tap((menu) => {
         this.menuSubject.next(menu);
-      }),
+      })
     );
   }
 
-  getMenuItems(): any[] {
+  getMenuItems(): MenuItem[] {
     return this.menuSubject.value;
   }
 
-  buildMenuTree(items: any[]): any[] {
-    const itemMap = new Map();
-    const rootItems: any[] = [];
+  buildMenuTree(items: MenuItem[]): MenuItem[] {
+    const itemMap = new Map<string, MenuItem>();
+    const rootItems: MenuItem[] = [];
 
-    // Criar mapa de itens
     items.forEach((item) => {
       itemMap.set(item.id, { ...item, children: [] });
     });
 
-    // Construir árvore
     items.forEach((item) => {
       if (item.parent_id) {
         const parent = itemMap.get(item.parent_id);
         if (parent) {
-          parent.children.push(itemMap.get(item.id));
+          parent.children!.push(itemMap.get(item.id)!);
         }
       } else {
-        rootItems.push(itemMap.get(item.id));
+        rootItems.push(itemMap.get(item.id)!);
       }
     });
 
