@@ -1,0 +1,9 @@
+.layout-wrapper {
+  min-height: 100vh;
+  background: var(--color-neutral-light-10);
+}
+
+.layout-content {
+  position: relative;
+  z-index: 1;
+}

@@ -1,0 +1,13 @@
+<div class="po-wrapper layout-wrapper">
+  <po-toolbar p-title="Financas Mobile" [p-actions]="toolbarActions"></po-toolbar>
+
+  <po-menu
+    [p-collapsed]="false"
+    [p-automatic-toggle]="true"
+    [p-menus]="menuItems"
+  ></po-menu>
+
+  <div class="layout-content">
+    <router-outlet></router-outlet>
+  </div>
+</div>

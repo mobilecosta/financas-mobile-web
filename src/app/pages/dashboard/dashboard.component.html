@@ -1,0 +1,57 @@
+<div class="po-page">
+  <div class="po-page-content">
+    <po-page-default p-title="Dashboard" [p-breadcrumb]="breadcrumb">
+      <section class="dashboard-hero">
+        <h2 class="dashboard-title">Visao geral financeira</h2>
+        <p class="dashboard-subtitle">
+          Acompanhe indicadores do periodo e as ultimas movimentacoes consolidadas.
+        </p>
+      </section>
+
+      <div class="po-row" *ngIf="dashboard">
+        <div class="po-md-3">
+          <po-widget p-title="Saldo Total">
+            <div class="metric-value">{{ formatCurrency(dashboard.indicadores.saldoTotal) }}</div>
+          </po-widget>
+        </div>
+        <div class="po-md-3">
+          <po-widget p-title="Receitas do Mes">
+            <div class="metric-value positive">{{ formatCurrency(dashboard.indicadores.receitas) }}</div>
+          </po-widget>
+        </div>
+        <div class="po-md-3">
+          <po-widget p-title="Despesas do Mes">
+            <div class="metric-value negative">{{ formatCurrency(dashboard.indicadores.despesas) }}</div>
+          </po-widget>
+        </div>
+        <div class="po-md-3">
+          <po-widget p-title="Saldo do Mes">
+            <div class="metric-value">{{ formatCurrency(dashboard.indicadores.saldo) }}</div>
+          </po-widget>
+        </div>
+      </div>
+
+      <div class="po-row" *ngIf="dashboard">
+        <div class="po-md-4">
+          <po-widget p-title="Despesas por Categoria">
+            <po-chart
+              [p-series]="despesasSeries"
+              [p-type]="chartType"
+              [p-height]="280"
+            ></po-chart>
+          </po-widget>
+        </div>
+        <div class="po-md-8">
+          <po-widget p-title="Ultimas Transacoes">
+            <po-table
+              [p-items]="dashboard.transacoes"
+              [p-columns]="columns"
+              [p-loading]="isLoading"
+              p-striped
+            ></po-table>
+          </po-widget>
+        </div>
+      </div>
+    </po-page-default>
+  </div>
+</div>

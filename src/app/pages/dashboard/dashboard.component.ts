@@ -1,62 +1,57 @@
 import { Component, OnInit } from '@angular/core';
 import { CommonModule } from '@angular/common';
-import { PoModule } from '@po-ui/ng-components';
+import {
+  PoBreadcrumb,
+  PoChartSerie,
+  PoChartType,
+  PoModule,
+  PoNotificationService,
+} from '@po-ui/ng-components';
 import { ApiService } from '../../services/api.service';
+
+interface DashboardResponse {
+  tenant?: { nome?: string };
+  indicadores: {
+    saldoTotal: number;
+    receitas: number;
+    despesas: number;
+    saldo: number;
+  };
+  despesasPorCategoria: Record<string, number>;
+  transacoes: Array<{
+    tipo: string;
+    valor: number;
+  }>;
+}
 
 @Component({
   selector: 'app-dashboard',
   standalone: true,
   imports: [CommonModule, PoModule],
-  template: `
-    <po-container>
-      <po-page-default p-title="Dashboard">
-        <div class="po-row" *ngIf="dashboard">
-          <div class="po-md-3">
-            <po-info
-              p-label="Saldo Total"
-              [p-value]="formatCurrency(dashboard.indicadores.saldoTotal)"
-            ></po-info>
-          </div>
-          <div class="po-md-3">
-            <po-info
-              p-label="Receitas"
-              [p-value]="formatCurrency(dashboard.indicadores.receitas)"
-            ></po-info>
-          </div>
-          <div class="po-md-3">
-            <po-info
-              p-label="Despesas"
-              [p-value]="formatCurrency(dashboard.indicadores.despesas)"
-            ></po-info>
-          </div>
-          <div class="po-md-3">
-            <po-info
-              p-label="Saldo do Mês"
-              [p-value]="formatCurrency(dashboard.indicadores.saldo)"
-            ></po-info>
-          </div>
-        </div>
-
-        <po-divider p-label="Transações Recentes"></po-divider>
-        <po-table
-          [p-items]="dashboard?.transacoes || []"
-          [p-columns]="columns"
-        ></po-table>
-      </po-page-default>
-    </po-container>
-  `,
-  styles: [],
+  templateUrl: './dashboard.component.html',
+  styleUrl: './dashboard.component.scss',
 })
 export class DashboardComponent implements OnInit {
-  dashboard: any;
+  dashboard: DashboardResponse | null = null;
+  isLoading = false;
+
+  readonly breadcrumb: PoBreadcrumb = {
+    items: [{ label: 'Dashboard' }],
+  };
+
+  readonly chartType: PoChartType = PoChartType.Donut;
+
+  despesasSeries: PoChartSerie[] = [];
+
   columns: any[] = [
-    { property: 'descricao', label: 'Descrição' },
     { property: 'tipo', label: 'Tipo' },
     { property: 'valor', label: 'Valor', type: 'currency' },
-    { property: 'data_transacao', label: 'Data' },
   ];
 
-  constructor(private apiService: ApiService) {}
+  constructor(
+    private apiService: ApiService,
+    private notification: PoNotificationService,
+  ) {}
 
   ngOnInit(): void {
     this.loadDashboard();
@@ -68,13 +63,30 @@ export class DashboardComponent implements OnInit {
   }
 
   loadDashboard(): void {
+    this.isLoading = true;
     this.apiService.get<any>('dashboard').subscribe({
       next: (data) => {
         this.dashboard = data;
+        this.despesasSeries = this.buildCategoryChartSeries(data.despesasPorCategoria);
+        this.isLoading = false;
       },
       error: (error) => {
         console.error('Erro ao carregar dashboard:', error);
+        this.notification.error('Nao foi possivel carregar o dashboard.');
+        this.isLoading = false;
       },
     });
+  }
+
+  private buildCategoryChartSeries(values: Record<string, number>): PoChartSerie[] {
+    if (!values) {
+      return [];
+    }
+
+    return Object.entries(values).map(([label, value]) => ({
+      label,
+      data: value,
+      tooltip: `${label}: ${this.formatCurrency(value)}`,
+    }));
   }
 }

@@ -1,0 +1,32 @@
+.dashboard-hero {
+  padding: 20px 24px;
+  margin-bottom: 20px;
+  border-radius: 12px;
+  background: linear-gradient(135deg, #eef8ff 0%, #f3fff5 100%);
+  border: 1px solid #d5e9dd;
+}
+
+.dashboard-title {
+  font-size: 1.4rem;
+  margin-bottom: 8px;
+  color: #202b38;
+}
+
+.dashboard-subtitle {
+  color: #55606f;
+}
+
+.metric-value {
+  font-size: 1.5rem;
+  font-weight: 700;
+  color: #202b38;
+  line-height: 1.2;
+}
+
+.metric-value.positive {
+  color: #0f6d3d;
+}
+
+.metric-value.negative {
+  color: #a82131;
+}

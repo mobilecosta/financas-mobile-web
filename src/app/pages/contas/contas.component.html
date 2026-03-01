@@ -1,0 +1,59 @@
+<div class="po-page">
+  <div class="po-page-content">
+    <po-page-default
+      p-title="Contas"
+      [p-breadcrumb]="breadcrumb"
+      [p-actions]="pageActions"
+    >
+      <section class="contas-hero">
+        <h2>Gestao de Contas</h2>
+        <p>Cadastre, edite e acompanhe os saldos das contas financeiras.</p>
+      </section>
+
+      <po-table
+        [p-items]="contas"
+        [p-columns]="columns"
+        [p-actions]="tableActions"
+        [p-loading]="loading"
+        p-striped
+      ></po-table>
+    </po-page-default>
+
+    <po-modal
+      #formModal
+      [p-title]="selectedContaId ? 'Editar Conta' : 'Nova Conta'"
+      [p-primary-action]="primaryAction"
+      [p-secondary-action]="secondaryAction"
+    >
+      <form class="contas-form">
+        <po-input
+          [(ngModel)]="formData.nome"
+          p-label="Nome"
+          p-name="nome"
+          p-required
+        ></po-input>
+
+        <po-select
+          [ngModel]="formData.tipo"
+          (ngModelChange)="formData.tipo = $event"
+          p-label="Tipo"
+          p-name="tipo"
+          [p-options]="tipoOptions"
+          p-required
+        ></po-select>
+
+        <po-number
+          [(ngModel)]="formData.saldo"
+          p-label="Saldo Inicial"
+          p-name="saldo"
+        ></po-number>
+
+        <po-textarea
+          [(ngModel)]="formData.descricao"
+          p-label="Descricao"
+          p-name="descricao"
+        ></po-textarea>
+      </form>
+    </po-modal>
+  </div>
+</div>

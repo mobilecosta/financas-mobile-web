@@ -9,21 +9,8 @@ import { AuthService } from '../services/auth.service';
   selector: 'app-layout',
   standalone: true,
   imports: [CommonModule, RouterModule, PoModule],
-  template: `
-    <po-toolbar
-      p-title="Financas Mobile"
-      [p-actions]="toolbarActions"
-    ></po-toolbar>
-    <div class="po-row">
-      <div class="po-md-3">
-        <po-menu [p-menus]="menuItems"></po-menu>
-      </div>
-      <div class="po-md-9">
-        <router-outlet></router-outlet>
-      </div>
-    </div>
-  `,
-  styles: [],
+  templateUrl: './layout.component.html',
+  styleUrl: './layout.component.scss',
 })
 export class LayoutComponent implements OnInit {
   menuItems: Array<PoMenuItem> = [];
@@ -62,14 +49,20 @@ export class LayoutComponent implements OnInit {
   }
 
   private mapToPoMenu(items: MenuItem[]): Array<PoMenuItem> {
-    return items.map(item => ({
-      label: item.label,
-      icon: this.convertIcon(item.icon),
-      link: item.rota || undefined,
-      subItems: item.children && item.children.length > 0 
-        ? this.mapToPoMenu(item.children) 
-        : undefined
-    }));
+    return items
+      .filter((item) => item.ativo !== false)
+      .sort((a, b) => (a.ordem || 0) - (b.ordem || 0))
+      .map((item) => {
+        const hasChildren = !!item.children?.length;
+
+        return {
+          label: item.label,
+          shortLabel: this.toShortLabel(item.label),
+          icon: this.convertIcon(item.icon),
+          link: item.rota ? this.normalizeRoute(item.rota) : undefined,
+          subItems: hasChildren ? this.mapToPoMenu(item.children || []) : undefined,
+        };
+      });
   }
 
   private convertIcon(icon: string | undefined): string {
@@ -87,9 +80,40 @@ export class LayoutComponent implements OnInit {
       'po-icon-user': 'po-icon-user',
       'po-icon-lock': 'po-icon-lock',
       'po-icon-document': 'po-icon-document',
+      'an an-house-line': 'po-icon-home',
+      'an an-chart-bar': 'po-icon-chart',
+      'an an-bank': 'po-icon-finance',
+      'an an-wallet': 'po-icon-finance',
+      'an an-gear': 'po-icon-settings',
     };
     
     return iconMap[icon] || 'po-icon-folder';
+  }
+
+  private normalizeRoute(route: string): string {
+    if (!route) {
+      return '';
+    }
+
+    return route.startsWith('/') ? route : `/${route}`;
+  }
+
+  private toShortLabel(label: string): string {
+    if (!label) {
+      return 'Menu';
+    }
+
+    const words = label.split(' ').filter(Boolean);
+
+    if (words.length === 1) {
+      return words[0].slice(0, 12);
+    }
+
+    return words
+      .slice(0, 2)
+      .map((word) => word[0])
+      .join('')
+      .toUpperCase();
   }
 
   logout(): void {

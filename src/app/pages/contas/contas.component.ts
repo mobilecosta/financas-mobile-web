@@ -1,79 +1,78 @@
 import { Component, OnInit, ViewChild } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { FormsModule, ReactiveFormsModule } from '@angular/forms';
-import { PoModule, PoModalComponent } from '@po-ui/ng-components';
+import {
+  PoBreadcrumb,
+  PoModalComponent,
+  PoModule,
+  PoNotificationService,
+  PoPageAction,
+  PoTableAction,
+} from '@po-ui/ng-components';
 import { ApiService } from '../../services/api.service';
-import { FormMetadataService } from '../../services/form-metadata.service';
+
+interface Conta {
+  id: string;
+  nome: string;
+  tipo: string;
+  saldo: number;
+  descricao?: string;
+}
+
+interface ContasResponse {
+  items: Conta[];
+  totalRecords: number;
+}
 
 @Component({
   selector: 'app-contas',
   standalone: true,
   imports: [CommonModule, FormsModule, ReactiveFormsModule, PoModule],
-  template: `
-    <po-container>
-      <po-page-default p-title="Contas">
-        <po-button
-          p-label="Nova Conta"
-          p-icon="ICON_PLUS"
-          (p-click)="openForm()"
-        ></po-button>
-
-        <po-table
-          [p-items]="contas"
-          [p-columns]="columns"
-          [p-loading]="loading"
-        ></po-table>
-
-        <po-modal
-          #formModal
-          p-title="Formulário de Conta"
-          [p-primary-action]="primaryAction"
-          [p-secondary-action]="secondaryAction"
-        >
-          <form>
-            <po-input
-              [(ngModel)]="formData.nome"
-              p-label="Nome"
-              p-name="nome"
-              p-required
-            ></po-input>
-
-            <po-select
-              [ngModel]="formData.tipo"
-              (ngModelChange)="formData.tipo = $event"
-              p-label="Tipo"
-              p-name="tipo"
-              [p-options]="tipoOptions"
-              p-required
-            ></po-select>
-
-            <po-number
-              [(ngModel)]="formData.saldo"
-              p-label="Saldo"
-              p-name="saldo"
-            ></po-number>
-
-            <po-textarea
-              [(ngModel)]="formData.descricao"
-              p-label="Descrição"
-              p-name="descricao"
-            ></po-textarea>
-          </form>
-        </po-modal>
-      </po-page-default>
-    </po-container>
-  `,
-  styles: [],
+  templateUrl: './contas.component.html',
+  styleUrl: './contas.component.scss',
 })
 export class ContasComponent implements OnInit {
   @ViewChild('formModal') formModal!: PoModalComponent;
 
-  contas: any[] = [];
+  contas: Conta[] = [];
   loading = false;
   page = 1;
   pageSize = 10;
   total = 0;
-  formData: any = {};
+  selectedContaId: string | null = null;
+  formData: Partial<Conta> = this.createEmptyForm();
+
+  readonly breadcrumb: PoBreadcrumb = {
+    items: [{ label: 'Dashboard', link: '/dashboard' }, { label: 'Contas' }],
+  };
+
+  readonly pageActions: PoPageAction[] = [
+    {
+      label: 'Incluir',
+      icon: 'po-icon-plus',
+      action: () => this.openCreateForm(),
+    },
+    {
+      label: 'Atualizar',
+      icon: 'po-icon-refresh',
+      action: () => this.loadContas(),
+    },
+  ];
+
+  readonly tableActions: PoTableAction[] = [
+    {
+      label: 'Editar',
+      icon: 'po-icon-edit',
+      action: (row: Conta) => this.openEditForm(row),
+    },
+    {
+      label: 'Excluir',
+      icon: 'po-icon-delete',
+      type: 'danger',
+      action: (row: Conta) => this.deleteConta(row),
+    },
+  ];
+
   tipoOptions = [
     { label: 'Corrente', value: 'Corrente' },
     { label: 'Poupança', value: 'Poupança' },
@@ -85,6 +84,7 @@ export class ContasComponent implements OnInit {
     { property: 'nome', label: 'Nome' },
     { property: 'tipo', label: 'Tipo' },
     { property: 'saldo', label: 'Saldo', type: 'currency' },
+    { property: 'descricao', label: 'Descricao' },
   ];
 
   primaryAction: any = {
@@ -99,7 +99,7 @@ export class ContasComponent implements OnInit {
 
   constructor(
     private apiService: ApiService,
-    private formMetadataService: FormMetadataService,
+    private notification: PoNotificationService,
   ) {}
 
   ngOnInit(): void {
@@ -109,35 +109,84 @@ export class ContasComponent implements OnInit {
   loadContas(): void {
     this.loading = true;
     this.apiService
-      .get<any>('contas', { page: this.page, pageSize: this.pageSize })
+      .get<ContasResponse>('contas', { page: this.page, pageSize: this.pageSize })
       .subscribe({
         next: (data) => {
-          this.contas = data.items;
-          this.total = data.totalRecords;
+          this.contas = data.items || [];
+          this.total = data.totalRecords || 0;
           this.loading = false;
         },
         error: (error) => {
           console.error('Erro ao carregar contas:', error);
+          this.notification.error('Nao foi possivel carregar as contas.');
           this.loading = false;
         },
       });
   }
 
-  openForm(): void {
-    this.formData = {};
+  openCreateForm(): void {
+    this.selectedContaId = null;
+    this.formData = this.createEmptyForm();
+    this.formModal.open();
+  }
+
+  openEditForm(conta: Conta): void {
+    this.selectedContaId = conta.id;
+    this.formData = { ...conta };
     this.formModal.open();
   }
 
   saveAccount(): void {
-    this.apiService.post('contas', this.formData).subscribe({
+    const payload = {
+      nome: this.formData.nome?.trim(),
+      tipo: this.formData.tipo,
+      saldo: Number(this.formData.saldo || 0),
+      descricao: this.formData.descricao?.trim() || undefined,
+    };
+
+    if (!payload.nome || !payload.tipo) {
+      this.notification.warning('Preencha nome e tipo da conta.');
+      return;
+    }
+
+    const request$ = this.selectedContaId
+      ? this.apiService.patch(`contas/${this.selectedContaId}`, payload)
+      : this.apiService.post('contas', payload);
+
+    request$.subscribe({
       next: () => {
         this.loadContas();
-        this.formData = {};
+        this.formData = this.createEmptyForm();
+        this.selectedContaId = null;
         this.formModal.close();
+        this.notification.success('Conta salva com sucesso.');
       },
       error: (error) => {
         console.error('Erro ao salvar conta:', error);
+        this.notification.error('Nao foi possivel salvar a conta.');
       },
     });
+  }
+
+  private deleteConta(conta: Conta): void {
+    this.apiService.delete(`contas/${conta.id}`).subscribe({
+      next: () => {
+        this.notification.success('Conta excluida com sucesso.');
+        this.loadContas();
+      },
+      error: (error) => {
+        console.error('Erro ao excluir conta:', error);
+        this.notification.error('Nao foi possivel excluir a conta.');
+      },
+    });
+  }
+
+  private createEmptyForm(): Partial<Conta> {
+    return {
+      nome: '',
+      tipo: '',
+      saldo: 0,
+      descricao: '',
+    };
   }
 }
